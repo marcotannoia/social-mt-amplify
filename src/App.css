@@ -1,42 +1,149 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Sfondo generale in bianco e nero */
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #ffffff 0, #f2f2f2 40%, #000000 100%);
+  color: #000;
+  position: relative;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Leggera sfocatura/luce sullo sfondo */
+.bg-blur {
+  position: absolute;
+  width: 60vh;
+  height: 60vh;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px);
+  top: -10%;
+  right: -10%;
+  pointer-events: none;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
+/* Card centrale */
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 380px;
+  max-width: 90vw;
+  background: rgba(0, 0, 0, 0.88);
+  color: #f5f5f5;
+  border-radius: 20px;
+  padding: 28px 26px 24px;
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  /* animazione ingresso */
+  transform: translateY(20px) scale(0.98);
+  opacity: 0;
+  animation: card-in 0.7s ease-out forwards;
+}
+
+@keyframes card-in {
   to {
-    transform: rotate(360deg);
+    transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.app-title {
+  font-size: 24px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0 0 4px;
 }
 
-.card {
-  padding: 2em;
+.app-subtitle {
+  font-size: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #9f9f9f;
+  margin-bottom: 18px;
 }
 
-.read-the-docs {
-  color: #888;
+/* Stile base per l'Authenticator di Amplify */
+.auth-wrapper {
+  --amplify-components-authenticator-container-background-color: transparent;
+  --amplify-components-button-primary-background-color: #ffffff;
+  --amplify-components-button-primary-color: #000000;
+  --amplify-components-button-primary-hover-background-color: #e5e5e5;
+  --amplify-components-button-border-radius: 999px;
+  --amplify-components-fieldcontrol-border-radius: 999px;
+  --amplify-components-fieldcontrol-border-color: #3a3a3a;
+  --amplify-components-fieldcontrol-focus-border-color: #ffffff;
+  --amplify-components-tabs-item-active-border-color: #ffffff;
+  --amplify-components-tabs-item-color: #b3b3b3;
+  --amplify-components-tabs-item-active-color: #ffffff;
+}
+
+/* Riduciamo un po' i padding delle form */
+.amplify-authenticator {
+  --amplify-space-large: 1rem;
+  --amplify-space-medium: 0.8rem;
+}
+
+/* Social buttons hover */
+.amplify-socialproviderbutton {
+  transition: transform 0.16s ease-out, box-shadow 0.16s ease-out;
+}
+
+.amplify-socialproviderbutton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* Campi input focus */
+.amplify-field__control {
+  transition: border-color 0.16s ease-out, box-shadow 0.16s ease-out;
+}
+
+.amplify-field__control:focus-within {
+  box-shadow: 0 0 0 1px #ffffff33;
+}
+
+/* Schermata dopo login */
+.logged-in {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 8px;
+}
+
+.logged-in h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.logged-in p {
+  font-size: 13px;
+  color: #b3b3b3;
+}
+
+.logout-btn {
+  margin-top: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background 0.18s ease-out, color 0.18s ease-out,
+    transform 0.12s ease-out;
+}
+
+.logout-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-1px);
 }
