@@ -1,6 +1,8 @@
 import { a, defineData } from '@aws-amplify/backend';
+//  in questo file vado  a definire l'intero mio database
 
-const schema = a.schema({
+// schema fisso :
+const schema = a.schema({ // relativo ad un singolo post, ha diversi attributi
   Post: a
     .model({
       id: a.id().required(),
@@ -16,7 +18,7 @@ const schema = a.schema({
       allow.owner(),
     ]),
 
-  Follow: a
+  Follow: a // relativo al follow tra utenti, ha un id di follow, id del follower e id del followed
     .model({
       id: a.id().required(),
       followerId: a.string().required(),
@@ -27,7 +29,7 @@ const schema = a.schema({
       allow.owner(),
     ]),
 
-  Like: a
+  Like: a // ogni like invece ha un id, un id del post e un id
     .model({
       id: a.id().required(),
       postId: a.string().required(),

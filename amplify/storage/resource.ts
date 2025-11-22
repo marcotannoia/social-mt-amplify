@@ -5,7 +5,7 @@ export const storage = defineStorage({
   access: (allow) => ({
     'public/': [
       // utenti autenticati possono leggere/scrivere immagini
-      allow.authenticated.to(['read', 'write']),
+      allow.authenticated.to(['read', 'write']),  // praticamente tutti i NON owner possono fare queste azioni
     ],
   }),
 });
