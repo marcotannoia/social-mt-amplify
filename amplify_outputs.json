@@ -318,5 +318,25 @@
       "nonModels": {}
     }
   },
+  "storage": {
+    "aws_region": "eu-south-1",
+    "bucket_name": "amplify-socialmtamplify-m-postimagesbucket87ea7667-hkdv2uyez4fo",
+    "buckets": [
+      {
+        "name": "postImages",
+        "bucket_name": "amplify-socialmtamplify-m-postimagesbucket87ea7667-hkdv2uyez4fo",
+        "aws_region": "eu-south-1",
+        "paths": {
+          "public/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write"
+            ]
+          }
+        }
+      }
+    ]
+  },
   "version": "1.4"
 }
