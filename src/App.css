@@ -387,3 +387,26 @@
     min-height: auto;
   }
 }
+
+.navbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #000;
+  padding: 14px;
+  display: flex;
+  justify-content: space-around;
+  font-size: 26px;
+  color: white;
+  border-top: 1px solid #333;
+}
+
+.navbar a {
+  color: #999;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.navbar a.active {
+  color: #fff;
+}
