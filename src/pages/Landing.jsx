@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
 import "../App.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Landing() {
-  const [showLogin, setShowLogin] = useState(false);
+  const navigate = useNavigate();
+
+  const goToApp = () => {
+    // vai all'home: se non sei loggato, vedrai il login Amplify
+    navigate("/home");
+  };
 
   return (
     <div className="app-root">
@@ -17,7 +20,7 @@ export default function Landing() {
           <span className="logo-sub">discover • share • profile</span>
         </div>
 
-        <button className="topbar-login" onClick={() => setShowLogin(true)}>
+        <button className="topbar-login" onClick={goToApp}>
           Login
         </button>
       </header>
@@ -77,44 +80,11 @@ export default function Landing() {
             <div className="profile-username">@guest</div>
           </div>
 
-          <button className="primary-btn" onClick={() => setShowLogin(true)}>
+          <button className="primary-btn" onClick={goToApp}>
             Crea il tuo profilo
           </button>
         </section>
       </main>
-
-      {/* LOGIN MODAL */}
-      {showLogin && (
-        <div className="modal-backdrop" onClick={() => setShowLogin(false)}>
-          <div
-            className="modal-card auth-wrapper"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="modal-close"
-              onClick={() => setShowLogin(false)}
-            >
-              ✕
-            </button>
-
-            <p className="app-subtitle">Sign in to continue</p>
-
-            <Authenticator>
-              {({ user, signOut }) =>
-                user ? (
-                  <div className="logged-in">
-                    <h2>Hi {user?.username}</h2>
-                    <p>Login effettuato.</p>
-                    <button className="logout-btn" onClick={signOut}>
-                      Logout
-                    </button>
-                  </div>
-                ) : null
-              }
-            </Authenticator>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -410,3 +410,60 @@
 .navbar a.active {
   color: #fff;
 }
+
+
+.create-post-page {
+  padding: 80px 16px 80px;
+  max-width: 600px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.create-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.file-input-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid #444;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.file-input-label input {
+  display: none;
+}
+
+.image-preview {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #333;
+  max-height: 400px;
+}
+
+.image-preview img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.caption-input {
+  background: #111;
+  border-radius: 12px;
+  border: 1px solid #333;
+  padding: 10px 12px;
+  min-height: 80px;
+  color: #fff;
+  resize: vertical;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 13px;
+}

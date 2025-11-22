@@ -10,6 +10,7 @@ import Explore from "./pages/Explore.jsx";
 import Profile from "./pages/Profile.jsx";
 import CreatePost from "./pages/CreatePost.jsx"; // se non ce l’hai ancora, lascialo fuori
 
+
 import Navbar from "./components/Navbar.jsx";
 
 function App() {
@@ -62,21 +63,7 @@ function App() {
       />
 
       {/* Se hai la pagina Crea Post */}
-      {/* 
-      <Route
-        path="/create"
-        element={
-          <Authenticator>
-            {({ user }) => (
-              <div className="app-wrapper">
-                <Navbar />
-                <CreatePost user={user} />
-              </div>
-            )}
-          </Authenticator>
-        }
-      />
-      */}
+
 
       {/* Route fallback */}
       <Route path="*" element={<Navigate to="/" />} />

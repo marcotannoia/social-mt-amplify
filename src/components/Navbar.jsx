@@ -11,6 +11,9 @@ export default function Navbar() {
       <Link className={location.pathname === "/explore" ? "active" : ""} to="/explore">
         🔍
       </Link>
+      <Link className={location.pathname === "/create" ? "active" : ""} to="/create">
+        ➕
+      </Link>
       <Link className={location.pathname === "/profile" ? "active" : ""} to="/profile">
         👤
       </Link>
