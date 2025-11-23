@@ -1,23 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { uploadData } from "aws-amplify/storage";   
-import { generateClient } from "aws-amplify/data";  
-
-
+import { uploadData } from "aws-amplify/storage";
+import { generateClient } from "aws-amplify/data";
 
 const client = generateClient();
 
 export default function CreatePost({ user }) {
-  const [file, setFile] = useState(null); //quale file è stato selezionato, inizialmente nessuno
-  const [previewUrl, setPreviewUrl] = useState(""); //serve per mostrare l'anteprima dell'immagine selezionata
-  const [caption, setCaption] = useState(""); // in pratica la didascalia del post, inizialmente vuota
-  const [isPublishing, setIsPublishing] = useState(false); // serve per disabilitare il pulsante durante la pubblicazione, in pratica mentre pubblico il bottone scompare
-  const [error, setError] = useState(""); // per mostrare eventuali errori all'utente
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [caption, setCaption] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [error, setError] = useState("");
 
-  const navigate = useNavigate(); // funzione standard che velociza la navigazione tra pagine
+  const navigate = useNavigate();
 
-  const handleFileChange = (e) => { 
-    const selected = e.target.files?.[0]; 
+  const handleFileChange = (e) => {
+    const selected = e.target.files?.[0];
     if (!selected) return;
 
     setFile(selected);
@@ -32,26 +30,26 @@ export default function CreatePost({ user }) {
         return;
       }
 
-      setIsPublishing(true); //immagine selezionata, inizio pubblicazione
+      setIsPublishing(true);
       setError("");
 
-      // 1) carico l'immagine su S3
-      const fileKey = `public/${Date.now()}-${file.name}`;
+      const { data: allPosts } = await client.models.Post.list({ limit: 10000 });
+      const nextPostNumber = (allPosts?.items?.length || 0) + 1;
+      const fileExtension = file.name.split('.').pop();
+      const fileKey = `public/post-${nextPostNumber}.${fileExtension}`;
 
-      await uploadData({ // fa capire come vengono memorizzati su S3 i file
+      await uploadData({
         path: fileKey,
         data: file,
       }).result;
 
-      // 2) creo il record Post nel DB Amplify
       await client.models.Post.create({
-        ownerId: user.userId ?? user?.username, // ? serve per mandare a schermo un UNDEFINED qualora non esista userId
+        ownerId: user.userId ?? user?.username,
         imageKey: fileKey,
         caption,
         createdAt: new Date().toISOString(),
       });
 
-      // 3) torno alla home
       navigate("/home");
     } catch (err) {
       console.error(err);
@@ -62,40 +60,41 @@ export default function CreatePost({ user }) {
   };
 
   return (
-  <div className="create-post-form">
-    <h3 style={{ marginBottom: "8px" }}>Crea un nuovo post</h3>
+    <div className="create-post-form">
+      {/* Input File Nascosto + Label Stilizzata */}
+      <label className="file-input-label">
+        <span style={{ fontSize: "20px", marginRight: "8px" }}>📸</span>
+        <span>Scegli una foto dalla galleria</span>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          style={{ display: "none" }} // NASCONDE IL BRUTTO INPUT DI DEFAULT
+        />
+      </label>
 
-    <label className="file-input-label">
-      <span>Scegli una foto</span>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
+      {previewUrl && (
+        <div className="image-preview">
+          <img src={previewUrl} alt="preview" />
+        </div>
+      )}
+
+      <textarea
+        className="caption-input"
+        placeholder="Scrivi una descrizione..."
+        value={caption}
+        onChange={(e) => setCaption(e.target.value)}
       />
-    </label>
 
-    {previewUrl && (
-      <div className="image-preview">
-        <img src={previewUrl} alt="preview" />
-      </div>
-    )}
+      {error && <p className="error-message">{error}</p>}
 
-    <textarea
-      className="caption-input"
-      placeholder="Scrivi una descrizione..."
-      value={caption}
-      onChange={(e) => setCaption(e.target.value)}
-    />
-
-    {error && <p className="error-message">{error}</p>}
-
-    <button
-      className="primary-btn"
-      onClick={handlePublish}
-      disabled={isPublishing}
-    >
-      {isPublishing ? "Pubblico..." : "Pubblica"}
-    </button>
-  </div>
-);
+      <button
+        className="primary-btn"
+        onClick={handlePublish}
+        disabled={isPublishing}
+      >
+        {isPublishing ? "Pubblicazione in corso..." : "Pubblica Post"}
+      </button>
+    </div>
+  );
 }

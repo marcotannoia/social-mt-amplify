@@ -10,9 +10,16 @@ export default function Home({ user }) {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
 
+  // Storie finte per demo
+  const stories = [
+    { id: 1, user: "Tu", isMe: true },
+    { id: 2, user: "Anna" },
+    { id: 3, user: "Marco" },
+    { id: 4, user: "Giulia" },
+    { id: 5, user: "Luca" },
+  ];
+
   useEffect(() => {
-    // QUI in futuro filtrerai solo i "Seguiti". 
-    // Per ora mostriamo tutto il feed come placeholder funzionale.
     async function fetchPosts() {
       try {
         const { data: allPosts } = await client.models.Post.list();
@@ -35,65 +42,72 @@ export default function Home({ user }) {
 
   return (
     <div className="app-root">
-      <div className="app-gradient" />
+      
+      {/* 1. BARRA STORIE (In alto) */}
+      <div className="stories-container">
+        {stories.map((story) => (
+          <div className="story-item" key={story.id}>
+            <div className="story-ring">
+              <div 
+                className="story-avatar" 
+                style={{background: story.isMe ? '#444' : `hsl(${Math.random()*360}, 60%, 50%)`}} 
+              />
+            </div>
+            <span className="story-username">{story.user}</span>
+          </div>
+        ))}
+      </div>
 
-      <header className="topbar">
-        <div className="logo">
-          <span className="logo-main">SOCIAL.MT</span>
-          <span className="logo-sub">Seguiti</span>
-        </div>
-        {/* Mostriamo chi è loggato */}
-        <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-           <span style={{fontSize:'12px', color:'#ccc'}}>Ciao, {user?.signInDetails?.loginId}</span>
-        </div>
-      </header>
+      {/* 2. FEED POST */}
+      <div className="mobile-feed-layout">
+        {posts.map((post) => (
+          <article className="post-card" key={post.id}>
+            <div className="post-header">
+              <div className="avatar" style={{background: `hsl(${post.ownerId.length * 10}, 60%, 50%)`}} />
+              <div className="username">{post.ownerId}</div>
+              <span style={{marginLeft:'auto', color:'#888'}}>...</span>
+            </div>
+            
+            {post.imageUrl && (
+              <img src={post.imageUrl} alt="Post" className="post-image" />
+            )}
+            
+            <div className="post-actions">
+              <span>❤️</span> <span>💬</span> <span>🚀</span>
+              <span style={{marginLeft:'auto'}}>🔖</span>
+            </div>
 
-      <main className="layout">
+            <div className="post-caption">
+              <strong>{post.ownerId}</strong>
+              {post.caption}
+            </div>
+          </article>
+        ))}
+        {/* Spazio vuoto finale per lo scroll */}
+        <div style={{height: '60px'}}></div>
+      </div>
+
+      {/* 3. NAVBAR FISSA (In basso) */}
+      <nav className="bottom-navbar">
+        <button className="nav-item active" onClick={() => navigate("/home")}>
+          <span className="nav-icon">🏠</span>
+        </button>
+        <button className="nav-item" onClick={() => alert("Cerca")}>
+          <span className="nav-icon">🔍</span>
+        </button>
         
-        {/* SINISTRA: LOGHI PERSONE SEGUITE */}
-        <section className="column">
-          <h2 className="section-title">I tuoi Follow</h2>
-          {/* Esempio statico */}
-          <div className="profile-preview" style={{flexDirection:'row', justifyContent:'flex-start'}}>
-             <div className="avatar" style={{background: 'purple'}} />
-             <div className="username">Amico 1</div>
-          </div>
-          <div className="profile-preview" style={{flexDirection:'row', justifyContent:'flex-start'}}>
-             <div className="avatar" style={{background: 'green'}} />
-             <div className="username">Amico 2</div>
-          </div>
-        </section>
+        {/* Tasto CENTRALE (+) per Creare */}
+        <button className="nav-item nav-item-create" onClick={() => navigate("/profile")}>
+          <div className="create-btn-circle">+</div>
+        </button>
 
-        {/* CENTRO: FEED SEGUITI */}
-        <section className="column column-main">
-          <h2 className="section-title">Feed Amici</h2>
-          {posts.map((post) => (
-            <article className="post-card" key={post.id}>
-              <div className="post-header">
-                <div className="avatar" />
-                <div className="username">{post.ownerId}</div>
-              </div>
-              {post.imageUrl && <img src={post.imageUrl} alt="Post" className="post-image" />}
-              <p className="post-caption">{post.caption}</p>
-            </article>
-          ))}
-        </section>
-
-        {/* DESTRA: LINK AL PROFILO */}
-        <section className="column">
-          <h2 className="section-title">Il tuo spazio</h2>
-          <div className="profile-preview">
-            <div className="avatar avatar-large" />
-            <div className="profile-name">Tu</div>
-            <button 
-              className="primary-btn" 
-              onClick={() => navigate("/profile")}
-            >
-              Vai al Profilo & Crea
-            </button>
-          </div>
-        </section>
-      </main>
+        <button className="nav-item" onClick={() => alert("Reels")}>
+          <span className="nav-icon">🎬</span>
+        </button>
+        <button className="nav-item" onClick={() => navigate("/profile")}>
+          <span className="nav-icon">👤</span>
+        </button>
+      </nav>
     </div>
   );
 }
