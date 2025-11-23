@@ -1,11 +1,43 @@
-import "../App.css";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { generateClient } from "aws-amplify/data";
+import { getUrl } from "aws-amplify/storage";
+import "../App.css";
+
+const client = generateClient();
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
 
-  const goToApp = () => {
-    // vai all'home: se non sei loggato, vedrai il login Amplify
+  // Carichiamo i post "Per Te" (Tutti i post pubblici)
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const { data: allPosts } = await client.models.Post.list();
+        
+        // Per ogni post, generiamo l'URL dell'immagine da S3
+        const postsWithImages = await Promise.all(
+          allPosts.map(async (post) => {
+            if (post.imageKey) {
+              const link = await getUrl({ path: post.imageKey });
+              return { ...post, imageUrl: link.url };
+            }
+            return post;
+          })
+        );
+        
+        // Ordiniamo dal più recente
+        // Nota: Idealmente useresti una query ordinata dal backend
+        setPosts(postsWithImages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      } catch (e) {
+        console.error("Errore fetch post", e);
+      }
+    }
+    fetchPosts();
+  }, []);
+
+  const goToLogin = () => {
     navigate("/home");
   };
 
@@ -13,76 +45,74 @@ export default function Landing() {
     <div className="app-root">
       <div className="app-gradient" />
 
-      {/* TOP BAR */}
+      {/* TOP BAR SEMPLIFICATA */}
       <header className="topbar">
         <div className="logo">
           <span className="logo-main">SOCIAL.MT</span>
-          <span className="logo-sub">discover • share • profile</span>
+          <span className="logo-sub">Per Te</span>
         </div>
-
-        <button className="topbar-login" onClick={goToApp}>
-          Login
+        <button className="topbar-login" onClick={goToLogin}>
+          Accedi
         </button>
       </header>
 
-      {/* COLONNE */}
       <main className="layout">
-        {/* LEFT */}
+        
+        {/* SINISTRA: SUGGERITI (Loghi statici per ora) */}
         <section className="column">
-          <h2 className="section-title">Explore</h2>
-          <p className="section-text">
-            Esplora i contenuti anche senza account.
-          </p>
-
-          <div className="card-placeholder">
-            <div className="pill pill-small" />
-            <div className="line line-wide" />
-            <div className="line line-medium" />
+          <h2 className="section-title">Consigliati</h2>
+          <div className="profile-preview" style={{flexDirection:'row', justifyContent:'flex-start'}}>
+             <div className="avatar" style={{background: 'red'}} />
+             <div>
+                <div className="username">Ferrari</div>
+                <div className="section-text" style={{margin:0, fontSize:'10px'}}>@ferrari</div>
+             </div>
           </div>
-
-          <div className="card-placeholder">
-            <div className="pill pill-small" />
-            <div className="line line-wide" />
-            <div className="line line-short" />
+          <div className="profile-preview" style={{flexDirection:'row', justifyContent:'flex-start'}}>
+             <div className="avatar" style={{background: 'blue'}} />
+             <div>
+                <div className="username">PlayStation</div>
+                <div className="section-text" style={{margin:0, fontSize:'10px'}}>@sony</div>
+             </div>
           </div>
         </section>
 
-        {/* CENTER */}
+        {/* CENTRO: FEED "PER TE" */}
         <section className="column column-main">
-          <h2 className="section-title">Feed</h2>
-          <p className="section-text">
-            Qui mostrerai i post reali presi da Amplify.
-          </p>
+          <h2 className="section-title">Per Te</h2>
+          
+          {posts.length === 0 && <p className="section-text">Caricamento feed...</p>}
 
-          <article className="post-card">
-            <div className="post-header">
-              <div className="avatar" />
-              <div>
-                <div className="username">mt_user</div>
-                <div className="timestamp">2 min fa</div>
+          {posts.map((post) => (
+            <article className="post-card" key={post.id}>
+              <div className="post-header">
+                <div className="avatar" />
+                <div>
+                  <div className="username">{post.ownerId}</div>
+                  <div className="timestamp">{new Date(post.createdAt).toLocaleDateString()}</div>
+                </div>
               </div>
-            </div>
-            <div className="post-image-placeholder" />
-            <p className="post-caption">Esempio di post.</p>
-          </article>
+              
+              {post.imageUrl && (
+                <img src={post.imageUrl} alt="Post" className="post-image" />
+              )}
+              
+              <p className="post-caption">{post.caption}</p>
+            </article>
+          ))}
         </section>
 
-        {/* RIGHT */}
+        {/* DESTRA: WIDGET LOGIN */}
         <section className="column">
-          <h2 className="section-title">Profile</h2>
+          <h2 className="section-title">Unisciti</h2>
           <p className="section-text">
-            Profilo ospite visualizzabile da tutti.
+            Vuoi pubblicare le tue foto e seguire i tuoi amici?
           </p>
-
-          <div className="profile-preview">
-            <div className="avatar avatar-large" />
-            <div className="profile-name">Ospite</div>
-            <div className="profile-username">@guest</div>
+          <div className="card-placeholder" style={{textAlign: 'center', padding: '30px 10px'}}>
+             <h3>🔥</h3>
+             <p style={{fontSize:'12px', color:'#999'}}>Entra nella community</p>
+             <button className="primary-btn" onClick={goToLogin}>LOGIN</button>
           </div>
-
-          <button className="primary-btn" onClick={goToApp}>
-            Crea il tuo profilo
-          </button>
         </section>
       </main>
     </div>

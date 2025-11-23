@@ -493,3 +493,25 @@ img, video {
   max-width: 100%;
   height: auto;
 }
+
+/* NUOVA CLASSE: Righe profilo interattive */
+.profile-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer; /* Fa apparire la manina */
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.profile-row:hover {
+  background: rgba(255, 255, 255, 0.1); /* Si illumina al passaggio */
+  transform: translateX(5px); /* Si sposta leggermente a destra */
+}
+
+.profile-row:active {
+  transform: scale(0.98); /* Effetto "premuto" */
+}

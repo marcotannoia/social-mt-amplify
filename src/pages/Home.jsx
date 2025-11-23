@@ -1,77 +1,97 @@
+import { useEffect, useState } from "react";
+import { generateClient } from "aws-amplify/data";
+import { getUrl } from "aws-amplify/storage";
+import { useNavigate } from "react-router-dom";
 import "../App.css";
-import CreatePost from "./CreatePost.jsx";
+
+const client = generateClient();
 
 export default function Home({ user }) {
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    // QUI in futuro filtrerai solo i "Seguiti". 
+    // Per ora mostriamo tutto il feed come placeholder funzionale.
+    async function fetchPosts() {
+      try {
+        const { data: allPosts } = await client.models.Post.list();
+        const postsWithImages = await Promise.all(
+          allPosts.map(async (post) => {
+            if (post.imageKey) {
+              const link = await getUrl({ path: post.imageKey });
+              return { ...post, imageUrl: link.url };
+            }
+            return post;
+          })
+        );
+        setPosts(postsWithImages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    fetchPosts();
+  }, []);
+
   return (
     <div className="app-root">
       <div className="app-gradient" />
 
+      <header className="topbar">
+        <div className="logo">
+          <span className="logo-main">SOCIAL.MT</span>
+          <span className="logo-sub">Seguiti</span>
+        </div>
+        {/* Mostriamo chi è loggato */}
+        <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+           <span style={{fontSize:'12px', color:'#ccc'}}>Ciao, {user?.signInDetails?.loginId}</span>
+        </div>
+      </header>
+
       <main className="layout">
-        {/* COLONNA SINISTRA - SEGUITI */}
+        
+        {/* SINISTRA: LOGHI PERSONE SEGUITE */}
         <section className="column">
-          <h2 className="section-title">Seguiti</h2>
-          <p className="section-text">
-            Qui vedrai i post delle persone che segui.
-          </p>
-
-          <div className="card-placeholder">
-            <div className="pill pill-small" />
-            <div className="line line-wide" />
-            <div className="line line-medium" />
+          <h2 className="section-title">I tuoi Follow</h2>
+          {/* Esempio statico */}
+          <div className="profile-preview" style={{flexDirection:'row', justifyContent:'flex-start'}}>
+             <div className="avatar" style={{background: 'purple'}} />
+             <div className="username">Amico 1</div>
           </div>
-
-          <div className="card-placeholder">
-            <div className="pill pill-small" />
-            <div className="line line-wide" />
-            <div className="line line-short" />
+          <div className="profile-preview" style={{flexDirection:'row', justifyContent:'flex-start'}}>
+             <div className="avatar" style={{background: 'green'}} />
+             <div className="username">Amico 2</div>
           </div>
         </section>
 
-        {/* COLONNA CENTRALE - FEED + CREA POST */}
+        {/* CENTRO: FEED SEGUITI */}
         <section className="column column-main">
-          <h2 className="section-title">Feed</h2>
-          <p className="section-text">
-            Qui appariranno i post dal backend Amplify.
-          </p>
-
-          {/* CREA POST SOLO SE UTENTE LOGGATO */}
-          {user && (
-            <div style={{ marginBottom: "16px" }}>
-              <CreatePost user={user} />
-            </div>
-          )}
-
-          {/* Post placeholder */}
-          <article className="post-card">
-            <div className="post-header">
-              <div className="avatar" />
-              <div>
-                <div className="username">mt_user</div>
-                <div className="timestamp">2 min fa</div>
+          <h2 className="section-title">Feed Amici</h2>
+          {posts.map((post) => (
+            <article className="post-card" key={post.id}>
+              <div className="post-header">
+                <div className="avatar" />
+                <div className="username">{post.ownerId}</div>
               </div>
-            </div>
-            <div className="post-image-placeholder" />
-            <p className="post-caption">
-              Questo è un esempio di post nel feed reale.
-            </p>
-          </article>
+              {post.imageUrl && <img src={post.imageUrl} alt="Post" className="post-image" />}
+              <p className="post-caption">{post.caption}</p>
+            </article>
+          ))}
         </section>
 
-        {/* COLONNA DESTRA - PROFILO UTENTE */}
+        {/* DESTRA: LINK AL PROFILO */}
         <section className="column">
-          <h2 className="section-title">Profilo</h2>
-          {user ? (
-            <>
-              <p className="section-text">
-                Sei loggato come {user?.signInDetails?.loginId}.
-              </p>
-              {/* qui più avanti potremo mettere foto profilo, bio, ecc */}
-            </>
-          ) : (
-            <p className="section-text">
-              Effettua il login per vedere il tuo profilo e pubblicare post.
-            </p>
-          )}
+          <h2 className="section-title">Il tuo spazio</h2>
+          <div className="profile-preview">
+            <div className="avatar avatar-large" />
+            <div className="profile-name">Tu</div>
+            <button 
+              className="primary-btn" 
+              onClick={() => navigate("/profile")}
+            >
+              Vai al Profilo & Crea
+            </button>
+          </div>
         </section>
       </main>
     </div>

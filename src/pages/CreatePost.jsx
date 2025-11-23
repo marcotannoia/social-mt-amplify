@@ -8,16 +8,16 @@ import { generateClient } from "aws-amplify/data";
 const client = generateClient();
 
 export default function CreatePost({ user }) {
-  const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [caption, setCaption] = useState("");
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [error, setError] = useState("");
+  const [file, setFile] = useState(null); //quale file è stato selezionato, inizialmente nessuno
+  const [previewUrl, setPreviewUrl] = useState(""); //serve per mostrare l'anteprima dell'immagine selezionata
+  const [caption, setCaption] = useState(""); // in pratica la didascalia del post, inizialmente vuota
+  const [isPublishing, setIsPublishing] = useState(false); // serve per disabilitare il pulsante durante la pubblicazione, in pratica mentre pubblico il bottone scompare
+  const [error, setError] = useState(""); // per mostrare eventuali errori all'utente
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // funzione standard che velociza la navigazione tra pagine
 
-  const handleFileChange = (e) => {
-    const selected = e.target.files?.[0];
+  const handleFileChange = (e) => { 
+    const selected = e.target.files?.[0]; 
     if (!selected) return;
 
     setFile(selected);
@@ -32,20 +32,20 @@ export default function CreatePost({ user }) {
         return;
       }
 
-      setIsPublishing(true);
+      setIsPublishing(true); //immagine selezionata, inizio pubblicazione
       setError("");
 
       // 1) carico l'immagine su S3
       const fileKey = `public/${Date.now()}-${file.name}`;
 
-      await uploadData({
+      await uploadData({ // fa capire come vengono memorizzati su S3 i file
         path: fileKey,
         data: file,
       }).result;
 
       // 2) creo il record Post nel DB Amplify
       await client.models.Post.create({
-        ownerId: user.userId ?? user?.username,
+        ownerId: user.userId ?? user?.username, // ? serve per mandare a schermo un UNDEFINED qualora non esista userId
         imageKey: fileKey,
         caption,
         createdAt: new Date().toISOString(),
